@@ -1,47 +1,42 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useEffect } from 'react';
 import { useParams, Outlet, Link } from 'react-router-dom';
 import HighlightedQuote from '../components/quotes/HighlightedQuote';
-const DUMMY_QUOTES = [
-	{
-		id: 'q1',
-		author: 'Albert Einstein',
-		text: 'Life is like riding a bicycle. To keep your balance you must keep moving.',
-	},
-	{
-		id: 'q2',
-		author: 'Dalai Lama',
-		text: 'The purpose of our lives is to be happy.',
-	},
-	{
-		id: 'q3',
-		author: 'Theodore Roosevelt',
-		text: 'Believe you can and you are halfway there.',
-	},
-	{
-		id: 'q4',
-		author: 'Confucius',
-		text: 'It does not matter how slowly you go as long as you do not stop.',
-	},
-	{
-		id: 'q5',
-		author: 'Nelson Mandela',
-		text: 'A winner is a dreamer who never gave up.',
-	},
-];
+import LoadingSpinner from '../components/UI/LoadingSpinner';
+import useHttp from '../hooks/use-http';
+import { getSingleQuote } from '../lib/api';
 
 const QuoteDetails = () => {
 	const params = useParams();
+	const { quoteId } = params;
+	const {
+		sendRequest,
+		status,
+		data: loadedQuote,
+		error,
+	} = useHttp(getSingleQuote, true);
 
-	console.log(params);
+	useEffect(() => {
+		sendRequest(quoteId);
+	}, [sendRequest, quoteId]);
 
-	const quote = DUMMY_QUOTES.find((quote) => quote.id === params.quoteId);
-	if (!quote) {
+	if (status === 'pending') {
+		<div className='centered'>
+			<LoadingSpinner />
+		</div>;
+	}
+
+	if (error) {
+		<p className='centered focus'>{error}</p>;
+	}
+
+	//const quote = DUMMY_QUOTES.find((quote) => quote.id === params.quoteId);
+	if (!loadedQuote.text) {
 		return <p>No Quote Found</p>;
 	}
 	/**How do we make the Load comment link disapper when comments are loaded? in V6 */
 	return (
 		<Fragment>
-			<HighlightedQuote text={quote.text} author={quote.author} />
+			<HighlightedQuote text={loadedQuote.text} author={loadedQuote.author} />
 			<div className='centered'>
 				<Link className='btn--flat' to={`/quotes/${params.quoteId}/comments`}>
 					Load Comments

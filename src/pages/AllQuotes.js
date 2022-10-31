@@ -1,36 +1,38 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import NoQuotesFound from '../components/quotes/NoQuotesFound';
 import QuoteList from '../components/quotes/QuoteList';
-
-const DUMMY_QUOTES = [
-	{
-		id: 'q1',
-		author: 'Albert Einstein',
-		text: 'Life is like riding a bicycle. To keep your balance you must keep moving.',
-	},
-	{
-		id: 'q2',
-		author: 'Dalai Lama',
-		text: 'The purpose of our lives is to be happy.',
-	},
-	{
-		id: 'q3',
-		author: 'Theodore Roosevelt',
-		text: 'Believe you can and you are halfway there.',
-	},
-	{
-		id: 'q4',
-		author: 'Confucius',
-		text: 'It does not matter how slowly you go as long as you do not stop.',
-	},
-	{
-		id: 'q5',
-		author: 'Nelson Mandela',
-		text: 'A winner is a dreamer who never gave up.',
-	},
-];
+import LoadingSpinner from '../components/UI/LoadingSpinner';
+import useHttp from '../hooks/use-http';
+import { getAllQuotes } from '../lib/api';
 
 const AllQuotes = () => {
-	return <QuoteList quotes={DUMMY_QUOTES} />;
+	const {
+		sendRequest,
+		status,
+		data: loadedQuotes,
+		error,
+	} = useHttp(getAllQuotes, true);
+
+	useEffect(() => {
+		sendRequest();
+	}, [sendRequest]);
+
+	if (status === 'pending') {
+		return (
+			<div className='centered'>
+				<LoadingSpinner />
+			</div>
+		);
+	}
+
+	if (error) {
+		<p className='centered focus'>{error}</p>;
+	}
+
+	if (status === 'completed' && (!loadedQuotes || loadedQuotes.length === 0)) {
+		return <NoQuotesFound />;
+	}
+	return <QuoteList quotes={loadedQuotes} />;
 };
 
 export default AllQuotes;

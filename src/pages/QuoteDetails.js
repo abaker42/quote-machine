@@ -30,7 +30,7 @@ const QuoteDetails = () => {
 	}
 
 	//const quote = DUMMY_QUOTES.find((quote) => quote.id === params.quoteId);
-	if (!loadedQuote.text) {
+	if (!loadedQuote) {
 		return <p>No Quote Found</p>;
 	}
 	/**How do we make the Load comment link disapper when comments are loaded? in V6 */

@@ -1,6 +1,5 @@
 import { Fragment } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import QuoteDetails from '../../pages/QuoteDetails';
 
 import QuoteItem from './QuoteItem';
 import classes from './QuoteList.module.css';
